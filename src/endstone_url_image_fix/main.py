@@ -5,7 +5,7 @@ import re
 
 class Main(Plugin):
     api_version = "0.10"
-    prefix = "URL Fix"
+    prefix = "URL Image Fix"
 
     def on_enable(self) -> None:
         self.logger.info("The URL Image Fix plugin has been enabled!")
@@ -14,18 +14,15 @@ class Main(Plugin):
     @event_handler
     def on_packet_send(self, event: PacketSendEvent) -> None:
         if event.packet_id == MinecraftPacketIds.ShowModalForm:
-            payload = event.payload
-
             pattern = re.compile(
                 rb'"data":"(https?://[^"]*)","type":"path"'
             )
 
             def replacer(match: re.Match):
                 url = match.group(1)
-
                 return b'"data":"' + url + b'","type":"url" '
 
-            payload = pattern.sub(replacer, payload)
+            event.payload = pattern.sub(replacer, event.payload)
 
             pattern_spaced = re.compile(
                 rb'"data":\s*"(https?://[^"]*)",\s*"type":\s*"path"'
@@ -35,6 +32,11 @@ class Main(Plugin):
                 url = match.group(1)
                 return b'"data":"' + url + b'", "type":"url" '
 
-            payload = pattern_spaced.sub(replacer_spaced, payload)
+            event.payload = pattern_spaced.sub(replacer_spaced, event.payload)
 
-            event.payload = payload
+            if event.player is not None:
+                self.server.scheduler.run_task(
+                    self,
+                    lambda player=event.player: player.send_message("§z"),
+                    delay=10,
+                )
