@@ -37,6 +37,6 @@ class Main(Plugin):
             if event.player is not None:
                 self.server.scheduler.run_task(
                     self,
-                    lambda player=event.player: player.send_message("§z"),
+                    lambda player=event.player: player.give_exp(0),
                     delay=10,
                 )
