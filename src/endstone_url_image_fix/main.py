@@ -4,7 +4,7 @@ from bedrock_protocol.packets.minecraft_packet_ids import MinecraftPacketIds
 import re
 
 class Main(Plugin):
-    api_version = "0.10"
+    api_version = "0.11"
     prefix = "URL Image Fix"
 
     def on_enable(self) -> None:
@@ -35,8 +35,12 @@ class Main(Plugin):
             event.payload = pattern_spaced.sub(replacer_spaced, event.payload)
 
             if event.player is not None:
-                self.server.scheduler.run_task(
-                    self,
-                    lambda player=event.player: player.give_exp(0),
-                    delay=10,
-                )
+                player_id = event.player.unique_id
+
+                def task():
+                    player = self.server.get_player(player_id)
+                    
+                    if player is not None:
+                        player.give_exp(0)
+
+                self.server.scheduler.run_task(self, task, delay=10)

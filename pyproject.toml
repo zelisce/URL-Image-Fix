@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "endstone-url-image-fix"
-version = "1.2.0"
+version = "1.3.0"
 description = "A plugin for Endstone that enables Add-Ons to send form buttons with URL images!"
 authors = [
     { name = "zelisce", email = "contact@zelisce.dev" }
